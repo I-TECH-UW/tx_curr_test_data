@@ -1,0 +1,18 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Python: Run main.py with Default Args",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/main.py",
+            "args": [
+                "TX_CURR_Test_Data_Generated_20240325_161241.xlsx",
+                "--start_date", "2023-01-01",
+                "--end_date", "2023-12-31",
+                "--output", "both"
+            ],
+            "console": "integratedTerminal"
+        }
+    ]
+}

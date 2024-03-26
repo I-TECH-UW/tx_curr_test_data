@@ -1,0 +1,14 @@
+version: '3.7'
+services:
+  hapi-fhir:
+    image: hapiproject/hapi:latest
+    container_name: hapi_fhir
+    environment:
+      - HAPI_FHIR_VERSION=dstu3 # Change this to match the FHIR version you are working with
+      - HAPI_FHIR_JPA_SERVER_ADDRESS=http://localhost:8080/fhir/
+      - HAPI_FHIR_LENIENT_HANDLING=true
+      - HAPI_FHIR_ALLOW_EXTERNAL_REFERENCES=true
+      - HAPI_FHIR_ALLOW_PLACEHOLDER_REFERENCES=true
+      - HAPI_FHIR_ALLOW_CONTAINED_RESOURCES=true
+    ports:
+      - "8080:8080"

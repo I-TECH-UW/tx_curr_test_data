@@ -51,19 +51,12 @@ def generate_random_row():
 
 # Compute numerator and denominator based on the dataset
 def compute_counts(df):
-    df['Numerator'] = df.apply(
-        lambda x: int(x['HIV_Positive'] and x['HIV_Treatment'] and not (x['Deceased'] or x['Stopped_ART'])),
-        axis=1
-    )
-    df['Denominator (EST)'] = df.apply(
-        lambda x: int(x['HIV_Positive'] and not (x['Deceased'] or x['Stopped_ART'])),
-        axis=1
-    )
+    df['Numerator'] = df.apply(lambda x: int(x['HIV_Positive'] and x['HIV_Treatment'] and not (x['Deceased'] or x['Stopped_ART'])), axis=1)
+    df['Denominator (EST)'] = df.apply(lambda x: int(x['HIV_Positive'] and not (x['Deceased'] or x['Stopped_ART'])), axis=1)
     total_numerator = df['Numerator'].sum()
     total_denominator = df['Denominator (EST)'].sum()
     overall_indicator = total_numerator / total_denominator if total_denominator else 0
-    return overall_indicator
-
+    return total_numerator, total_denominator, overall_indicator
 
 # Main function to generate the dataset and write to an Excel file
 def generate_dataset_and_excel(num_rows, file_name):
@@ -72,14 +65,21 @@ def generate_dataset_and_excel(num_rows, file_name):
         'Patient.ID', 'Patient.Gender', 'Patient.DOB', 'Patient.state (home)',
         'Key Population Status', 'HIV_Positive', 'HIV_Treatment', 'Deceased', 'Stopped_ART'
     ])
-    overall_indicator = compute_counts(df)
+    total_numerator, total_denominator, overall_indicator = compute_counts(df)
     
     # Write the dataset to an Excel file
-    with pd.ExcelWriter(file_name) as writer:
+    with pd.ExcelWriter(file_name, engine='openpyxl') as writer:
         df.to_excel(writer, index=False, sheet_name='Data')
-        pd.DataFrame([{'Overall Indicator': overall_indicator}]).to_excel(writer, index=False, sheet_name='Indicator')
+        
+        # Write the Indicator data to another sheet
+        indicator_df = pd.DataFrame({
+            'Total Numerator': [total_numerator],
+            'Total Denominator': [total_denominator],
+            'Overall Indicator': [overall_indicator]
+        })
+        indicator_df.to_excel(writer, index=False, sheet_name='Indicator')
 
     print(f'Dataset generated and written to {file_name}')
 
 # Usage example
-generate_dataset_and_excel(100, 'TX_CURR_Test_Data_Generated.xlsx')
+generate_dataset_and_excel(1000, 'TX_CURR_Test_Data_Generated_' + datetime.now().strftime('%Y%m%d_%H%M%S') + '.xlsx')
